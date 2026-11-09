@@ -304,7 +304,13 @@ document.getElementById("file").onchange = e => {
             iS = head.indexOf("已編"), ci = CODES.map(c => head.indexOf(c));
       if(iN < 0 || ci.some(i => i < 0)) throw new Error("欄位對不上");
       const have = DATA.segs.filter(x => done(x.n) || (state[x.n] && state[x.n].m)).length;
-      if(have && !confirm(`這會用檔案裡的內容覆蓋你目前的 ${have} 筆編碼，無法復原。\n\n請確認這個檔案是你自己先前「匯出 CSV」存下的進度檔，不是別人的編碼結果。\n\n確定要匯入嗎？`)) return;
+      const n_in = rows.slice(1).filter(r => +r[iN] && ci.some(i => r[i] === "1")).length;
+      if(!confirm(
+        `準備匯入檔案：${f.name}\n其中有 ${n_in} 筆已經帶著編碼。\n\n` +
+        (have ? `這會覆蓋你目前的 ${have} 筆編碼，無法復原。\n\n`
+              : `你目前還沒有編任何一筆。匯入後，這 ${n_in} 筆編碼會直接成為你的編碼。\n\n`) +
+        `只有「你自己先前匯出的進度檔」才能匯入。\n如果這是別人的編碼結果，按取消。\n\n確定要匯入嗎？`
+      )) return;
       let k = 0;
       rows.slice(1).forEach(row => {
         const n = +row[iN]; if(!state[n]) return;
